@@ -70,7 +70,7 @@ class Auth {
     public function requireSuperUser() {
         $this->requireLogin();
         if (!$this->isSuperUser()) {
-            header('Location: ../index.php');
+            header('Location: /icathane-web/index.php');
             exit;
         }
     }
