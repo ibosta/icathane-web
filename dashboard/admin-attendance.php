@@ -48,22 +48,31 @@ $students = $lessonManager->getLessonStudents($lessonId);
 // Form gönderildiğinde
 $message = '';
 if ($_POST) {
-    $topic = trim($_POST['topic']);
-    $attendanceData = $_POST['attendance'] ?? [];
-    
-    if (empty($topic)) {
-        $message = ['type' => 'danger', 'text' => 'Ders konusu zorunludur.'];
+    // CSRF token doğrulaması
+    $csrfToken = $_POST['csrf_token'] ?? '';
+    if (!$auth->validateCSRFToken($csrfToken)) {
+        $message = ['type' => 'danger', 'text' => 'Geçersiz güvenlik token\'ı. Lütfen sayfayı yenileyip tekrar deneyin.'];
     } else {
-        $result = $lessonManager->saveAttendance($lessonId, $topic, $attendanceData);
-        if ($result['success']) {
-            $message = ['type' => 'success', 'text' => $result['message']];
-            // Sayfayı yenile
-            header('Refresh: 2; url=reports.php?report_type=missing');
+        $topic = trim($_POST['topic']);
+        $attendanceData = $_POST['attendance'] ?? [];
+        
+        if (empty($topic)) {
+            $message = ['type' => 'danger', 'text' => 'Ders konusu zorunludur.'];
         } else {
-            $message = ['type' => 'danger', 'text' => $result['message']];
+            $result = $lessonManager->saveAttendance($lessonId, $topic, $attendanceData);
+            if ($result['success']) {
+                $message = ['type' => 'success', 'text' => $result['message']];
+                // Sayfayı yenile
+                header('Refresh: 2; url=reports.php?report_type=missing');
+            } else {
+                $message = ['type' => 'danger', 'text' => $result['message']];
+            }
         }
     }
 }
+
+// CSRF token oluştur
+$csrfToken = $auth->generateCSRFToken();
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -244,6 +253,9 @@ if ($_POST) {
             </div>
             <div class="card-body">
                 <form method="POST" action="">
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
+                    
                     <!-- Ders Konusu -->
                     <div class="mb-4">
                         <label for="topic" class="form-label fw-bold">Ders Konusu *</label>
