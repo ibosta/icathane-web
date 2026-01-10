@@ -1,9 +1,9 @@
 <?php
 $host = 'localhost';
-$port = '8888';
-$dbname = 'dbname';
-$username = 'username';
-$password = 'password';
+$port = '3306';
+$dbname = 'icathane-web';
+$username = 'root';
+$password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $username, $password);
