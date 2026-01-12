@@ -740,7 +740,7 @@ $recentClasses = array_slice($classes, 0, 5);
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="admin-attendance.php?lesson_id=<?php echo $missing['id']; ?>"
+                                            <a href="admin-attendance.php?lesson_id=<?php echo htmlspecialchars($missing['id'], ENT_QUOTES, 'UTF-8'); ?>"
                                                 class="btn btn-sm btn-outline-danger" title="Yoklamayı Tamamla">
                                                 <i class="fas fa-edit"></i>
                                             </a>
