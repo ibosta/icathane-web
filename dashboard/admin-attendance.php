@@ -348,11 +348,24 @@ if ($_POST) {
                 alert('Lütfen geçerli bir ders konusu giriniz.');
                 return false;
             }
-            
-            const selectedStudents = document.querySelectorAll('input[name^="attendance"]:checked').length;
-            if (selectedStudents === 0) {
+
+            // Her öğrenci için (her attendance name'i) bir seçim yapıldığından emin olun
+            const attendanceInputs = document.querySelectorAll('input[name^="attendance"]');
+            const studentNames = new Set();
+            attendanceInputs.forEach(input => {
+                studentNames.add(input.name);
+            });
+
+            let allStudentsSelected = true;
+            studentNames.forEach(name => {
+                if (!document.querySelector('input[name="' + name + '"]:checked')) {
+                    allStudentsSelected = false;
+                }
+            });
+
+            if (!allStudentsSelected) {
                 e.preventDefault();
-                alert('En az bir öğrenci için seçim yapmalısınız.');
+                alert('Lütfen tüm öğrenciler için yoklama seçimi yapınız.');
                 return false;
             }
         });
