@@ -51,8 +51,8 @@ if ($_POST) {
     $topic = trim($_POST['topic']);
     $attendanceData = $_POST['attendance'] ?? [];
     
-    if (empty($topic)) {
-        $message = ['type' => 'danger', 'text' => 'Ders konusu zorunludur.'];
+    if ($topic === '' || mb_strlen($topic) < 3) {
+        $message = ['type' => 'danger', 'text' => 'Ders konusu en az 3 karakter olmalıdır.'];
     } else {
         $result = $lessonManager->saveAttendance($lessonId, $topic, $attendanceData);
         if ($result['success']) {
