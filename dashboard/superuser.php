@@ -736,7 +736,7 @@ $recentClasses = array_slice($classes, 0, 5);
                                         </td>
                                         <td>
                                             <span class="overdue-badge">
-                                                <?php echo $missing['days_overdue']; ?> gün
+                                                <?php echo htmlspecialchars($missing['days_overdue'], ENT_QUOTES, 'UTF-8'); ?> gün
                                             </span>
                                         </td>
                                         <td>
