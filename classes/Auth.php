@@ -61,7 +61,7 @@ class Auth {
     // Giriş zorunluluğu kontrolü
     public function requireLogin() {
         if (!$this->isLoggedIn()) {
-            header('Location: /auth/login.php');
+            header('Location: /icathane-web/auth/login.php');
             exit;
         }
     }
@@ -70,7 +70,7 @@ class Auth {
     public function requireSuperUser() {
         $this->requireLogin();
         if (!$this->isSuperUser()) {
-            header('Location: /index.php');
+            header('Location: /icathane-web/index.php');
             exit;
         }
     }
