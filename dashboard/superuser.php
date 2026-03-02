@@ -27,6 +27,7 @@ $recentClasses = array_slice($classes, 0, 5);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,17 +42,17 @@ $recentClasses = array_slice($classes, 0, 5);
             --tugva-accent: #E8F8F8;
             --tugva-danger: #dc3545;
         }
-        
+
         body {
             background-color: var(--tugva-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .navbar {
             background: linear-gradient(135deg, var(--tugva-primary), var(--tugva-secondary));
             box-shadow: 0 2px 10px rgba(27, 155, 155, 0.3);
         }
-        
+
         .card {
             border: none;
             border-radius: 15px;
@@ -59,18 +60,18 @@ $recentClasses = array_slice($classes, 0, 5);
             margin-bottom: 1.5rem;
             transition: transform 0.3s ease;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
         }
-        
+
         .card-header {
             background: linear-gradient(135deg, var(--tugva-primary), var(--tugva-secondary));
             color: white;
             border-radius: 15px 15px 0 0;
             padding: 1rem 1.5rem;
         }
-        
+
         .stats-card {
             text-align: center;
             padding: 2rem 1rem;
@@ -78,43 +79,43 @@ $recentClasses = array_slice($classes, 0, 5);
             position: relative;
             overflow: hidden;
         }
-        
+
         .clickable-card {
             cursor: pointer;
             transition: all 0.4s ease;
             border: 2px solid transparent;
         }
-        
+
         .clickable-card:hover {
             transform: translateY(-10px) scale(1.02);
             box-shadow: 0 15px 40px rgba(27, 155, 155, 0.3);
             border-color: var(--tugva-primary);
         }
-        
+
         .clickable-card:hover .stats-number {
             transform: scale(1.1);
             color: var(--tugva-secondary);
         }
-        
+
         .clickable-card:hover .stats-action {
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         .stats-number {
             font-size: 3rem;
             font-weight: bold;
             color: var(--tugva-primary);
             transition: all 0.3s ease;
         }
-        
+
         .stats-label {
             font-size: 1.1rem;
             color: var(--tugva-secondary);
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
-        
+
         .stats-action {
             font-size: 0.9rem;
             color: var(--tugva-primary);
@@ -124,29 +125,29 @@ $recentClasses = array_slice($classes, 0, 5);
             transition: all 0.3s ease;
             margin-top: 0.5rem;
         }
-        
+
         /* Eksik yoklama kartı için özel stiller */
         .danger-card:hover {
             border-color: var(--tugva-danger);
             box-shadow: 0 15px 40px rgba(220, 53, 69, 0.3);
         }
-        
+
         .danger-number {
             color: var(--tugva-danger) !important;
         }
-        
+
         .danger-label {
             color: var(--tugva-danger) !important;
         }
-        
+
         .danger-action {
             color: var(--tugva-danger) !important;
         }
-        
+
         .danger-card:hover .stats-number {
             color: #c82333 !important;
         }
-        
+
         /* Kart içi animasyon efekti */
         .clickable-card::before {
             content: '';
@@ -160,25 +161,27 @@ $recentClasses = array_slice($classes, 0, 5);
             transition: all 0.6s ease;
             opacity: 0;
         }
-        
+
         .clickable-card:hover::before {
             animation: shine 0.6s ease;
         }
-        
+
         @keyframes shine {
             0% {
                 transform: translateX(-100%) translateY(-100%) rotate(45deg);
                 opacity: 0;
             }
+
             50% {
                 opacity: 1;
             }
+
             100% {
                 transform: translateX(100%) translateY(100%) rotate(45deg);
                 opacity: 0;
             }
         }
-        
+
         .btn-tugva {
             background: linear-gradient(135deg, var(--tugva-primary), var(--tugva-secondary));
             border: none;
@@ -188,13 +191,13 @@ $recentClasses = array_slice($classes, 0, 5);
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        
+
         .btn-tugva:hover {
             background: var(--tugva-secondary);
             color: white;
             transform: translateY(-2px);
         }
-        
+
         .quick-action-modern {
             background: linear-gradient(135deg, white, #f8fdfd);
             border: 2px solid var(--tugva-accent);
@@ -208,7 +211,7 @@ $recentClasses = array_slice($classes, 0, 5);
             position: relative;
             overflow: hidden;
         }
-        
+
         .quick-action-modern:hover {
             border-color: var(--tugva-primary);
             background: linear-gradient(135deg, var(--tugva-accent), white);
@@ -216,7 +219,7 @@ $recentClasses = array_slice($classes, 0, 5);
             transform: translateY(-8px);
             box-shadow: 0 12px 30px rgba(27, 155, 155, 0.25);
         }
-        
+
         .quick-icon-wrapper {
             background: linear-gradient(135deg, var(--tugva-accent), rgba(27, 155, 155, 0.1));
             border-radius: 50%;
@@ -228,17 +231,17 @@ $recentClasses = array_slice($classes, 0, 5);
             margin: 0 auto 1rem;
             transition: all 0.3s ease;
         }
-        
+
         .quick-action-modern:hover .quick-icon-wrapper {
             background: linear-gradient(135deg, var(--tugva-primary), var(--tugva-secondary));
             color: white;
             transform: rotate(5deg) scale(1.1);
         }
-        
+
         .quick-action-modern:hover .quick-icon-wrapper i {
             color: white;
         }
-        
+
         .quick-action-arrow {
             position: absolute;
             top: 15px;
@@ -255,44 +258,44 @@ $recentClasses = array_slice($classes, 0, 5);
             justify-content: center;
             font-size: 0.8rem;
         }
-        
+
         .quick-action-modern:hover .quick-action-arrow {
             opacity: 1;
             transform: translateX(0) scale(1);
         }
-        
+
         .quick-action-modern h6 {
             font-weight: 700;
             margin-bottom: 0.5rem;
             transition: all 0.3s ease;
         }
-        
+
         .quick-action-modern:hover h6 {
             color: var(--tugva-dark);
         }
-        
+
         .quick-action-modern small {
             opacity: 0.8;
             transition: all 0.3s ease;
         }
-        
+
         .quick-action-modern:hover small {
             opacity: 1;
             color: var(--tugva-secondary);
         }
-        
+
         .welcome-header {
             background: linear-gradient(135deg, var(--tugva-accent), white);
             border-radius: 15px;
             padding: 2rem;
             margin-bottom: 2rem;
         }
-        
+
         .missing-attendance {
             border-left: 4px solid var(--tugva-danger);
             background-color: #fff5f5;
         }
-        
+
         .overdue-badge {
             background-color: var(--tugva-danger);
             color: white;
@@ -301,168 +304,177 @@ $recentClasses = array_slice($classes, 0, 5);
             font-weight: 600;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
-        
+
         /* Mobil Responsive Ayarları */
         @media (max-width: 768px) {
             .welcome-header {
                 padding: 1rem;
                 text-align: center;
             }
-            
+
             .welcome-header h2 {
                 font-size: 1.5rem;
             }
-            
+
             /* Mobil istatistik kartları */
             .stats-card {
                 padding: 1rem 0.5rem;
                 margin-bottom: 1rem;
             }
-            
+
             .stats-number {
                 font-size: 2rem;
             }
-            
+
             .stats-label {
                 font-size: 0.9rem;
             }
-            
+
             .clickable-card:hover {
                 transform: translateY(-3px) scale(1.01);
             }
-            
+
             /* Mobil hızlı işlemler */
             .quick-action-modern {
                 padding: 1rem;
                 margin-bottom: 1rem;
             }
-            
+
             .quick-icon-wrapper {
                 width: 60px;
                 height: 60px;
                 margin-bottom: 0.75rem;
             }
-            
+
             .quick-action-modern h6 {
                 font-size: 1rem;
             }
-            
+
             .quick-action-modern small {
                 font-size: 0.8rem;
             }
-            
+
             /* Container padding */
             .container {
                 padding-left: 15px;
                 padding-right: 15px;
             }
-            
+
             /* Mobil navbar */
             .navbar-brand .brand-text {
                 font-size: 1.1rem;
             }
-            
+
             .navbar-collapse {
                 background: rgba(15, 122, 122, 0.95);
                 margin-top: 1rem;
                 border-radius: 10px;
                 padding: 1rem;
             }
-            
+
             .navbar-nav .nav-link {
                 padding: 0.75rem 1rem;
                 border-radius: 8px;
                 margin-bottom: 0.25rem;
                 transition: all 0.3s ease;
             }
-            
+
             .navbar-nav .nav-link:hover {
                 background-color: rgba(27, 155, 155, 0.3);
                 transform: translateX(5px);
             }
-            
+
             /* Eksik yoklamalar tablosu */
             .table-responsive {
                 font-size: 0.8rem;
             }
-            
+
             /* Mobil kartlar için grid düzeni */
             .row {
                 margin-left: -8px;
                 margin-right: -8px;
             }
-            
+
             .col-lg-2,
             .col-md-4,
             .col-sm-6 {
                 padding-left: 8px;
                 padding-right: 8px;
             }
-            
+
             /* Eksik yoklama uyarısı */
             .alert {
                 font-size: 0.9rem;
                 padding: 1rem;
             }
-            
+
             /* Mobil butonlar */
             .btn {
                 font-size: 0.9rem;
                 padding: 0.5rem 1rem;
             }
         }
-        
+
         @media (max-width: 576px) {
+
             /* Çok küçük ekranlar */
             .stats-number {
                 font-size: 1.8rem;
             }
-            
+
             .quick-icon-wrapper {
                 width: 50px;
                 height: 50px;
             }
-            
+
             .quick-action-modern h6 {
                 font-size: 0.9rem;
             }
-            
+
             .container {
                 padding-left: 10px;
                 padding-right: 10px;
             }
-            
+
             /* İstatistikler tek kolon */
             .col-lg-2 {
                 flex: 0 0 auto;
                 width: 50%;
             }
-            
+
             .welcome-header h2 {
                 font-size: 1.3rem;
             }
-            
+
             .welcome-header p {
                 font-size: 0.9rem;
             }
         }
-        
+
         /* Tablet için özel ayarlar */
         @media (min-width: 768px) and (max-width: 1024px) {
             .stats-card {
                 padding: 1.5rem 1rem;
             }
-            
+
             .quick-action-modern {
                 padding: 1.2rem;
             }
-            
+
             .quick-icon-wrapper {
                 width: 70px;
                 height: 70px;
@@ -470,6 +482,7 @@ $recentClasses = array_slice($classes, 0, 5);
         }
     </style>
 </head>
+
 <body>
     <!-- Navbar - Mobil Uyumlu -->
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -479,12 +492,12 @@ $recentClasses = array_slice($classes, 0, 5);
                 <span class="brand-text">TÜGVA Kocaeli Icathane</span>
                 <span class="brand-role d-none d-md-inline"> - Yönetici</span>
             </a>
-            
+
             <!-- Mobil Toggle Button -->
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Mobil Menü -->
                 <ul class="navbar-nav me-auto d-lg-none">
@@ -513,7 +526,7 @@ $recentClasses = array_slice($classes, 0, 5);
                         </a>
                     </li>
                 </ul>
-                
+
                 <!-- Kullanıcı Bilgileri -->
                 <div class="navbar-nav ms-auto">
                     <span class="navbar-text me-3 d-none d-lg-inline">
@@ -527,7 +540,7 @@ $recentClasses = array_slice($classes, 0, 5);
                         </div>
                     </div>
                     <a href="../auth/logout.php" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-sign-out-alt"></i> 
+                        <i class="fas fa-sign-out-alt"></i>
                         <span class="d-none d-sm-inline">Çıkış</span>
                     </a>
                 </div>
@@ -690,55 +703,62 @@ $recentClasses = array_slice($classes, 0, 5);
 
         <!-- Eksik Yoklamalar - UYARI -->
         <?php if (!empty($missingAttendance)): ?>
-        <div class="card missing-attendance mb-4">
-            <div class="card-header bg-danger">
-                <h5 class="mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Eksik Yoklamalar - ACİL DİKKAT!
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Öğretmen</th>
-                                <th>Sınıf</th>
-                                <th>Ders</th>
-                                <th>Tarih & Saat</th>
-                                <th>Gecikme</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach (array_slice($missingAttendance, 0, 10) as $missing): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($missing['teacher_name']); ?></td>
-                                <td><?php echo htmlspecialchars($missing['class_name']); ?></td>
-                                <td><?php echo htmlspecialchars($missing['lesson_name']); ?></td>
-                                <td>
-                                    <?php echo date('d.m.Y', strtotime($missing['lesson_date'])); ?>
-                                    <br>
-                                    <small><?php echo date('H:i', strtotime($missing['start_time'])); ?>-<?php echo date('H:i', strtotime($missing['end_time'])); ?></small>
-                                </td>
-                                <td>
-                                    <span class="overdue-badge">
-                                        <?php echo $missing['days_overdue']; ?> gün
-                                    </span>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+            <div class="card missing-attendance mb-4">
+                <div class="card-header bg-danger">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Eksik Yoklamalar - ACİL DİKKAT!
+                    </h5>
                 </div>
-                <?php if (count($missingAttendance) > 10): ?>
-                <div class="text-center mt-3">
-                    <a href="reports.php?type=missing" class="btn btn-danger">
-                        Tüm Eksik Yoklamaları Gör (<?php echo count($missingAttendance); ?> adet)
-                    </a>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Öğretmen</th>
+                                    <th>Sınıf</th>
+                                    <th>Ders</th>
+                                    <th>Tarih & Saat</th>
+                                    <th>Gecikme</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach (array_slice($missingAttendance, 0, 10) as $missing): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($missing['teacher_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($missing['class_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($missing['lesson_name']); ?></td>
+                                        <td>
+                                            <?php echo date('d.m.Y', strtotime($missing['lesson_date'])); ?>
+                                            <br>
+                                            <small><?php echo date('H:i', strtotime($missing['start_time'])); ?>-<?php echo date('H:i', strtotime($missing['end_time'])); ?></small>
+                                        </td>
+                                        <td>
+                                            <span class="overdue-badge">
+                                                <?php echo htmlspecialchars($missing['days_overdue'], ENT_QUOTES, 'UTF-8'); ?> gün
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="admin-attendance.php?lesson_id=<?php echo htmlspecialchars($missing['id'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                class="btn btn-sm btn-outline-danger" title="Yoklamayı Tamamla">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <?php if (count($missingAttendance) > 10): ?>
+                        <div class="text-center mt-3">
+                            <a href="reports.php?type=missing" class="btn btn-danger">
+                                Tüm Eksik Yoklamaları Gör (<?php echo count($missingAttendance); ?> adet)
+                            </a>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </div>
-        </div>
         <?php endif; ?>
 
         <div class="row">
@@ -763,19 +783,19 @@ $recentClasses = array_slice($classes, 0, 5);
                                 </thead>
                                 <tbody>
                                     <?php foreach ($recentTeachers as $teacher): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($teacher['full_name']); ?></td>
-                                        <td>
-                                            <span class="badge bg-primary"><?php echo $teacher['class_count']; ?></span>
-                                        </td>
-                                        <td>
-                                            <?php if ($teacher['last_login']): ?>
-                                                <small><?php echo date('d.m.Y H:i', strtotime($teacher['last_login'])); ?></small>
-                                            <?php else: ?>
-                                                <small class="text-muted">Hiç giriş yapmadı</small>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($teacher['full_name']); ?></td>
+                                            <td>
+                                                <span class="badge bg-primary"><?php echo $teacher['class_count']; ?></span>
+                                            </td>
+                                            <td>
+                                                <?php if ($teacher['last_login']): ?>
+                                                    <small><?php echo date('d.m.Y H:i', strtotime($teacher['last_login'])); ?></small>
+                                                <?php else: ?>
+                                                    <small class="text-muted">Hiç giriş yapmadı</small>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
@@ -810,19 +830,19 @@ $recentClasses = array_slice($classes, 0, 5);
                                 </thead>
                                 <tbody>
                                     <?php foreach ($recentClasses as $class): ?>
-                                    <tr>
-                                        <td>
-                                            <?php echo htmlspecialchars($class['name']); ?>
-                                            <br>
-                                            <small class="text-muted"><?php echo $class['academic_year']; ?></small>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success"><?php echo $class['student_count']; ?></span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info"><?php echo $class['teacher_count']; ?></span>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td>
+                                                <?php echo htmlspecialchars($class['name']); ?>
+                                                <br>
+                                                <small class="text-muted"><?php echo $class['academic_year']; ?></small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success"><?php echo $class['student_count']; ?></span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info"><?php echo $class['teacher_count']; ?></span>
+                                            </td>
+                                        </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
@@ -840,4 +860,5 @@ $recentClasses = array_slice($classes, 0, 5);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
