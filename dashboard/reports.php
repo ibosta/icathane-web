@@ -177,6 +177,69 @@ if ($reportType === 'attendance') {
 } else {
     $classStats = getClassStats($pdo, $classFilter, $dateStart, $dateEnd);
 }
+
+// Export XLS mantığı
+if (isset($_GET['export']) && $_GET['export'] == 'xls') {
+    header("Content-Type: application/vnd.ms-excel; charset=utf-8");
+    header("Content-Disposition: attachment; filename=raporlar_" . $reportType . "_" . date('Y-m-d') . ".xls");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    
+    echo '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+    echo '<head><meta charset="UTF-8"></head>';
+    echo '<body>';
+    echo '<table border="1">';
+    
+    if ($reportType === 'attendance' && isset($attendanceData)) {
+        echo '<thead><tr>';
+        echo '<th>Tarih</th><th>Sınıf</th><th>Ders</th><th>Öğretmen</th><th>Konu</th><th>Gelenler</th><th>Gelmeyenler</th><th>Devam Oranı (%)</th>';
+        echo '</tr></thead><tbody>';
+        foreach ($attendanceData as $record) {
+            echo '<tr>';
+            echo '<td>' . date('d.m.Y', strtotime($record['lesson_date'])) . '</td>';
+            echo '<td>' . htmlspecialchars($record['class_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($record['lesson_name']) . ' (' . date('H:i', strtotime($record['start_time'])) . '-' . date('H:i', strtotime($record['end_time'])) . ')</td>';
+            echo '<td>' . htmlspecialchars($record['teacher_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($record['topic'] ?? 'Konu girilmemiş') . '</td>';
+            echo '<td>' . ($record['present_count'] ?: 0) . '</td>';
+            echo '<td>' . ($record['absent_count'] ?: 0) . '</td>';
+            echo '<td>' . ($record['attendance_rate'] ?: 0) . '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+    } elseif ($reportType === 'missing' && isset($missingData)) {
+        echo '<thead><tr>';
+        echo '<th>Tarih</th><th>Sınıf</th><th>Ders</th><th>Öğretmen</th><th>Saat</th><th>Gecikme (Gün)</th>';
+        echo '</tr></thead><tbody>';
+        foreach ($missingData as $missing) {
+            echo '<tr>';
+            echo '<td>' . date('d.m.Y', strtotime($missing['lesson_date'])) . '</td>';
+            echo '<td>' . htmlspecialchars($missing['class_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($missing['lesson_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($missing['teacher_name']) . '</td>';
+            echo '<td>' . date('H:i', strtotime($missing['start_time'])) . '-' . date('H:i', strtotime($missing['end_time'])) . '</td>';
+            echo '<td>' . htmlspecialchars($missing['days_overdue']) . '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+    } elseif ($reportType === 'stats' && isset($classStats)) {
+        echo '<thead><tr>';
+        echo '<th>Sınıf</th><th>Öğrenci Sayısı</th><th>Tamamlanan/Toplam Ders</th><th>Devam Oranı (%)</th>';
+        echo '</tr></thead><tbody>';
+        foreach ($classStats as $stat) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($stat['class_name']) . '</td>';
+            echo '<td>' . $stat['total_students'] . '</td>';
+            echo '<td>' . $stat['completed_lessons'] . '/' . $stat['total_lessons'] . '</td>';
+            echo '<td>' . ($stat['attendance_rate'] ?: '0') . '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody>';
+    }
+    
+    echo '</table></body></html>';
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -416,9 +479,16 @@ if ($reportType === 'attendance') {
         <!-- Export Butonları -->
         <div class="export-buttons">
             <h6 class="mb-2"><i class="fas fa-download me-2"></i>Dışa Aktar:</h6>
-            <button class="btn btn-outline-success btn-sm me-2" onclick="exportToExcel()">
-                <i class="fas fa-file-excel me-1"></i> Excel
-            </button>
+            <?php
+            $exportUrl = 'reports.php?export=xls&report_type=' . $reportType . 
+                         (!empty($classFilter) ? '&class_id='.$classFilter : '') . 
+                         (!empty($teacherFilter) ? '&teacher_id='.$teacherFilter : '') . 
+                         (!empty($dateStart) && $reportType !== 'missing' ? '&date_start='.$dateStart : '') . 
+                         (!empty($dateEnd) && $reportType !== 'missing' ? '&date_end='.$dateEnd : '');
+            ?>
+            <a href="<?php echo $exportUrl; ?>" class="btn btn-outline-success btn-sm me-2">
+                <i class="fas fa-file-excel me-1"></i> Excel İndir
+            </a>
             <button class="btn btn-outline-danger btn-sm me-2" onclick="exportToPDF()">
                 <i class="fas fa-file-pdf me-1"></i> PDF
             </button>
@@ -691,34 +761,7 @@ if ($reportType === 'attendance') {
             updateReportTabs();
         });
 
-        function exportToExcel() {
-            // Excel export - basit CSV formatı
-            let table = document.querySelector('#attendanceTable');
-            if (!table) {
-                alert('Export edilecek tablo bulunamadı.');
-                return;
-            }
-
-            let csv = [];
-            let rows = table.querySelectorAll('tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                let row = [], cols = rows[i].querySelectorAll('td, th');
-                for (let j = 0; j < cols.length; j++) {
-                    row.push(cols[j].innerText);
-                }
-                csv.push(row.join(','));
-            }
-
-            let csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', 'tugva_yoklama_raporu.csv');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        // JS Excel export removed - handled by PHP instead
 
         function exportToPDF() {
             alert('PDF export özelliği yakında eklenecek.');

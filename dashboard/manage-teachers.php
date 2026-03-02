@@ -61,6 +61,21 @@ if ($_POST && isset($_POST['delete_teacher_permanently'])) {
     }
 }
 
+// Öğretmen düzenleme
+if ($_POST && isset($_POST['edit_teacher'])) {
+    $teacherId = $_POST['edit_teacher_id'];
+    $username = trim($_POST['edit_username']);
+    $fullName = trim($_POST['edit_full_name']);
+    $newPassword = trim($_POST['edit_password']);
+    
+    if (empty($teacherId) || empty($username) || empty($fullName)) {
+        $message = ['type' => 'danger', 'text' => 'Gerekli alanları doldurun.'];
+    } else {
+        $result = $userManager->updateTeacher($teacherId, $username, $fullName, $newPassword);
+        $message = ['type' => $result['success'] ? 'success' : 'danger', 'text' => $result['message']];
+    }
+}
+
 // Tüm öğretmenleri ve sınıfları getir
 $teachers = $userManager->getAllTeachers();
 $classes = $userManager->getAllClasses();
@@ -302,8 +317,14 @@ $classes = $userManager->getAllClasses();
                                             </td>
                                             <td>
                                                 <?php if ($teacher['is_active']): ?>
+                                                    <!-- Düzenle -->
+                                                    <button type="button" class="btn btn-sm btn-outline-info" title="Düzenle" 
+                                                            onclick="openEditModal(<?php echo htmlspecialchars(json_encode($teacher)); ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    
                                                     <!-- Güvenli Silme (Deaktif Et) -->
-                                                    <form method="POST" style="display: inline;" onsubmit="return confirm('<?php echo htmlspecialchars($teacher['full_name']); ?> adlı öğretmeni deaktif etmek istediğinizden emin misiniz?\\n\\nNot: Yoklama almış dersleri varsa işlem iptal edilecektir.')">
+                                                    <form method="POST" style="display: inline; margin-left: 5px;" onsubmit="return confirm('<?php echo htmlspecialchars($teacher['full_name']); ?> adlı öğretmeni deaktif etmek istediğinizden emin misiniz?\\n\\nNot: Yoklama almış dersleri varsa işlem iptal edilecektir.')">
                                                         <input type="hidden" name="teacher_id" value="<?php echo $teacher['id']; ?>">
                                                         <button type="submit" name="deactivate_teacher" class="btn btn-sm btn-outline-warning" title="Güvenli Silme">
                                                             <i class="fas fa-user-slash"></i>
@@ -353,8 +374,56 @@ $classes = $userManager->getAllClasses();
         </div>
     </div>
 
+    <!-- Edit Teacher Modal -->
+    <div class="modal fade" id="editTeacherModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--tugva-primary), var(--tugva-secondary)); color: white;">
+                    <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Öğretmen Düzenle</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="">
+                        <input type="hidden" id="edit_teacher_id" name="edit_teacher_id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ad Soyad *</label>
+                            <input type="text" class="form-control" id="edit_full_name" name="edit_full_name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kullanıcı Adı *</label>
+                            <input type="text" class="form-control" id="edit_username" name="edit_username" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Yeni Şifre</label>
+                            <input type="password" class="form-control" id="edit_password" name="edit_password" minlength="6">
+                            <small class="text-muted">Değiştirmek istemiyorsanız boş bırakın. (En az 6 karakter)</small>
+                        </div>
+                        
+                        <div class="text-end mt-4">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" name="edit_teacher" class="btn btn-tugva">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function openEditModal(teacher) {
+            document.getElementById('edit_teacher_id').value = teacher.id;
+            document.getElementById('edit_full_name').value = teacher.full_name;
+            document.getElementById('edit_username').value = teacher.username;
+            document.getElementById('edit_password').value = '';
+            
+            var modal = new bootstrap.Modal(document.getElementById('editTeacherModal'));
+            modal.show();
+        }
+
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
             const password = document.querySelector('#password').value;

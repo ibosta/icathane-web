@@ -30,6 +30,48 @@ class UserManager {
         return ['success' => false, 'message' => 'Öğretmen eklenirken hata oluştu.'];
     }
 
+    // Öğretmen güncelle (SuperUser için)
+    public function updateTeacher($teacherId, $username, $fullName, $newPassword = null) {
+        $stmt = $this->db->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+        $stmt->execute([$username, $teacherId]);
+        if ($stmt->fetch()) {
+            return ['success' => false, 'message' => 'Bu kullanıcı adı zaten kullanılıyor.'];
+        }
+        
+        if (!empty($newPassword)) {
+            $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare("UPDATE users SET username = ?, full_name = ?, password_hash = ? WHERE id = ? AND role = 'teacher'");
+            $result = $stmt->execute([$username, $fullName, $passwordHash, $teacherId]);
+        } else {
+            $stmt = $this->db->prepare("UPDATE users SET username = ?, full_name = ? WHERE id = ? AND role = 'teacher'");
+            $result = $stmt->execute([$username, $fullName, $teacherId]);
+        }
+
+        if ($result) {
+            return ['success' => true, 'message' => 'Öğretmen bilgileri güncellendi.'];
+        }
+        return ['success' => false, 'message' => 'Öğretmen güncellenirken hata oluştu.'];
+    }
+
+    // Şifre güncelle (Öğretmen için)
+    public function updatePassword($userId, $currentPassword, $newPassword) {
+        $stmt = $this->db->prepare("SELECT password_hash FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+        
+        if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
+            return ['success' => false, 'message' => 'Mevcut şifreniz yanlış.'];
+        }
+        
+        $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+        
+        if ($stmt->execute([$passwordHash, $userId])) {
+            return ['success' => true, 'message' => 'Şifreniz başarıyla güncellendi.'];
+        }
+        return ['success' => false, 'message' => 'Şifre güncellenirken hata oluştu.'];
+    }
+
     // Tüm öğretmenleri listele
     public function getAllTeachers() {
         $stmt = $this->db->prepare("
@@ -160,6 +202,19 @@ class UserManager {
             ORDER BY c.academic_year DESC, c.name
         ");
         $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Öğretmenin atandığı sınıfları getir
+    public function getTeacherClasses($teacherId) {
+        $stmt = $this->db->prepare("
+            SELECT c.id, c.name, c.academic_year
+            FROM classes c
+            JOIN teacher_classes tc ON c.id = tc.class_id
+            WHERE tc.teacher_id = ?
+            ORDER BY c.name
+        ");
+        $stmt->execute([$teacherId]);
         return $stmt->fetchAll();
     }
 
