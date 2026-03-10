@@ -166,15 +166,15 @@ class MaterialManager {
     // Öğretmenin erişebileceği materyaller
     public function getTeacherMaterials($teacherId) {
         $sql = "
-            SELECT 
+            SELECT DISTINCT
                 lm.*,
                 c.name as class_name,
                 u.full_name as uploader_name
             FROM lesson_materials lm
             LEFT JOIN classes c ON lm.class_id = c.id
-            LEFT JOIN teacher_classes tc ON c.id = tc.class_id
+            LEFT JOIN teacher_classes tc ON c.id = tc.class_id AND tc.teacher_id = ?
             JOIN users u ON lm.uploaded_by = u.id
-            WHERE (tc.teacher_id = ? OR lm.is_public = 1)
+            WHERE (tc.teacher_id IS NOT NULL OR lm.is_public = 1 OR lm.class_id IS NULL)
             ORDER BY lm.created_at DESC
         ";
         

@@ -13,18 +13,21 @@ if (!$auth->isTeacher()) {
 }
 
 $materialManager = new MaterialManager($pdo);
+$teacherId = $_SESSION['user_id'];
 
-// Herkese açık materyalleri getir
+// Öğretmenin erişebileceği materyalleri getir
 $stmt = $pdo->prepare("
-    SELECT 
+    SELECT DISTINCT
         lm.*,
         u.full_name as uploader_name
     FROM lesson_materials lm
     JOIN users u ON lm.uploaded_by = u.id
-    WHERE lm.is_public = 1
+    LEFT JOIN classes c ON lm.class_id = c.id
+    LEFT JOIN teacher_classes tc ON c.id = tc.class_id AND tc.teacher_id = ?
+    WHERE (lm.is_public = 1 OR lm.class_id IS NULL OR tc.teacher_id IS NOT NULL)
     ORDER BY lm.created_at DESC
 ");
-$stmt->execute();
+$stmt->execute([$teacherId]);
 $materials = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
