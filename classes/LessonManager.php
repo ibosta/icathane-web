@@ -138,6 +138,35 @@ class LessonManager {
         return $stmt->fetchAll();
     }
 
+    // Öğretmenin geçmişte işlenmiş (yoklaması alınmış) derslerini getir
+    public function getTeacherPastLessons($teacherId) {
+        $stmt = $this->db->prepare("
+            SELECT 
+                l.id,
+                l.lesson_date,
+                l.topic,
+                l.attendance_marked,
+                ws.lesson_name,
+                ws.start_time,
+                ws.end_time,
+                c.name as class_name,
+                c.id as class_id,
+                COUNT(s.id) as total_students,
+                SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) as present_count,
+                SUM(CASE WHEN a.status = 'absent' THEN 1 ELSE 0 END) as absent_count
+            FROM lessons l
+            JOIN weekly_schedule ws ON l.schedule_id = ws.id
+            JOIN classes c ON ws.class_id = c.id
+            LEFT JOIN students s ON c.id = s.class_id AND s.is_active = 1
+            LEFT JOIN attendance a ON l.id = a.lesson_id AND s.id = a.student_id
+            WHERE ws.teacher_id = ? AND l.attendance_marked = 1
+            GROUP BY l.id
+            ORDER BY l.lesson_date DESC, ws.start_time DESC
+        ");
+        $stmt->execute([$teacherId]);
+        return $stmt->fetchAll();
+    }
+
     // Ders için öğrenci listesini getir
     public function getLessonStudents($lessonId) {
         $stmt = $this->db->prepare("

@@ -3,6 +3,7 @@ session_start();
 require_once '../config/database.php';
 require_once '../classes/Auth.php';
 require_once '../classes/MaterialManager.php';
+require_once '../classes/UserManager.php';
 
 $auth = new Auth($pdo);
 $auth->requireLogin();
@@ -13,7 +14,39 @@ if (!$auth->isTeacher()) {
 }
 
 $materialManager = new MaterialManager($pdo);
+$userManager = new UserManager($pdo);
 $teacherId = $_SESSION['user_id'];
+$message = '';
+
+// Kendi sınıflarını getir
+$teacherClasses = $userManager->getTeacherClasses($teacherId);
+
+// Materyal Yükleme
+if ($_POST && isset($_POST['upload_material'])) {
+    $title = trim($_POST['title']);
+    $description = trim($_POST['description']);
+    $classId = isset($_POST['class_id']) && $_POST['class_id'] !== '' ? $_POST['class_id'] : null;
+    $lessonId = null; // Şimdilik boş bırakıyoruz
+    $isPublic = isset($_POST['is_public']) ? 1 : 0;
+    
+    // Güvenlik: Öğretmenin o sınıfa gerçekten erişimi var mı kontrol et (isPublic değilse ve sınıf seçildiyse)
+    $hasAccess = false;
+    foreach ($teacherClasses as $tc) {
+        if ($tc['id'] == $classId) {
+            $hasAccess = true;
+            break;
+        }
+    }
+    
+    if (empty($title) || !isset($_FILES['material_file']) || $_FILES['material_file']['error'] === UPLOAD_ERR_NO_FILE) {
+        $message = ['type' => 'danger', 'text' => 'Lütfen başlık ve dosya seçin.'];
+    } elseif ($classId && !$hasAccess) {
+        $message = ['type' => 'danger', 'text' => 'Bu sınıfa materyal yükleme yetkiniz yok.'];
+    } else {
+        $result = $materialManager->uploadMaterial($_FILES['material_file'], $title, $teacherId, $description, $classId, $lessonId, $isPublic);
+        $message = ['type' => $result['success'] ? 'success' : 'danger', 'text' => $result['message']];
+    }
+}
 
 // Öğretmenin erişebileceği materyalleri getir
 $materials = $materialManager->getTeacherMaterials($teacherId);
@@ -175,47 +208,106 @@ sort($fileTypes);
     </nav>
 
     <div class="container mt-4">
-        <!-- Filtreler -->
-        <div class="filter-bar">
-            <form method="GET" class="row g-2 align-items-center">
-                <div class="col-md-4">
-                    <select class="form-select form-select-sm" name="class_filter" onchange="this.form.submit()">
-                        <option value="">Tüm Materyaller</option>
-                        <option value="public" <?php echo $classFilter === 'public' ? 'selected' : ''; ?>>Herkese Açık</option>
-                        <?php foreach (array_keys($materialsByClass) as $className): ?>
-                            <option value="<?php echo htmlspecialchars($className); ?>" <?php echo $classFilter === $className ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($className); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select form-select-sm" name="type_filter" onchange="this.form.submit()">
-                        <option value="">Tüm Dosya Tipleri</option>
-                        <?php foreach ($fileTypes as $type): ?>
-                            <option value="<?php echo $type; ?>" <?php echo $typeFilter === $type ? 'selected' : ''; ?>>
-                                <?php echo strtoupper($type); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            <?php echo count($materials); ?> materyal bulundu
-                        </small>
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-secondary" onclick="toggleView('grid')">
-                                <i class="fas fa-th"></i>
+        <!-- Mesaj -->
+        <?php if ($message): ?>
+        <div class="alert alert-<?php echo $message['type']; ?> alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($message['text']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php endif; ?>
+
+        <div class="row">
+            <!-- Sol Sütun: Form -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-upload me-2"></i>
+                            Yeni Materyal Yükle
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="title" class="form-label fw-bold">Başlık *</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label fw-bold">Açıklama</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="class_id" class="form-label fw-bold">Sınıf</label>
+                                <select class="form-select" id="class_id" name="class_id">
+                                    <option value="">Sınıf Seçin (İsteğe Bağlı)</option>
+                                    <?php foreach ($teacherClasses as $class): ?>
+                                        <option value="<?php echo $class['id']; ?>">
+                                            <?php echo htmlspecialchars($class['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="material_file" class="form-label fw-bold">Dosya *</label>
+                                <input type="file" class="form-control mb-1" id="material_file" name="material_file" required>
+                                <small class="text-muted d-block">İzin verilen: PDF, DOCX, PPTX, XLSX, TXT, ZIP, RAR, MP4, MP3, JPG, PNG (Maks: 50MB)</small>
+                            </div>
+
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="is_public" name="is_public" value="1">
+                                <label class="form-check-label" for="is_public">
+                                    <i class="fas fa-globe text-primary"></i> Herkese Açık Olsun 
+                                    <small class="text-muted d-block">Diğer öğretmenler de görebilir.</small>
+                                </label>
+                            </div>
+                            
+                            <button type="submit" name="upload_material" class="btn btn-tugva w-100">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>
+                                Materyali Yükle
                             </button>
-                            <button type="button" class="btn btn-outline-secondary" onclick="toggleView('list')">
-                                <i class="fas fa-list"></i>
-                            </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <!-- Sağ Sütun: Materyal Listesi -->
+            <div class="col-md-8">
+                <!-- Filtreler -->
+                <div class="filter-bar">
+                    <form method="GET" class="row g-2 align-items-center">
+                        <div class="col-md-4">
+                            <select class="form-select form-select-sm" name="class_filter" onchange="this.form.submit()">
+                                <option value="">Tüm Materyaller</option>
+                                <option value="public" <?php echo $classFilter === 'public' ? 'selected' : ''; ?>>Herkese Açık</option>
+                                <?php foreach (array_keys($materialsByClass) as $className): ?>
+                                    <option value="<?php echo htmlspecialchars($className); ?>" <?php echo $classFilter === $className ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($className); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" name="type_filter" onchange="this.form.submit()">
+                                <option value="">Tüm Dosya Tipleri</option>
+                                <?php foreach ($fileTypes as $type): ?>
+                                    <option value="<?php echo $type; ?>" <?php echo $typeFilter === $type ? 'selected' : ''; ?>>
+                                        <?php echo strtoupper($type); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <?php echo count($materials); ?> materyal bulundu
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
         <?php if (empty($materials)): ?>
             <!-- Materyal Yok -->
@@ -380,6 +472,8 @@ sort($fileTypes);
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
+            </div>
+        </div>
 
         <!-- Hızlı Navigasyon -->
         <div class="card">

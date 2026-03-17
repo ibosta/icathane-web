@@ -101,7 +101,54 @@ for ($i = 0; $i < 4; $i++) {
     }
 }
 
-$days = [1 => 'Pazartesi', 2 => 'Salı', 3 => 'Çarşamba', 4 => 'Perşembe', 5 => 'Cuma', 6 => 'Cumartesi', 7 => 'Pazar'];
+}
+
+// Export XLS
+if (isset($_GET['export']) && $_GET['export'] == 'xls') {
+    header("Content-Type: application/vnd.ms-excel; charset=utf-8");
+    header("Content-Disposition: attachment; filename=ogrenci_devam_raporu_" . str_replace(' ', '_', $studentInfo['student_name']) . "_" . date('Y-m-d') . ".xls");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+
+    echo '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+    echo '<head><meta charset="UTF-8"></head>';
+    echo '<body>';
+    
+    echo '<h3>Öğrenci Devam Raporu</h3>';
+    echo '<table border="0">';
+    echo '<tr><td><strong>Öğrenci:</strong></td><td>' . htmlspecialchars($studentInfo['student_name']) . '</td></tr>';
+    echo '<tr><td><strong>Sınıf:</strong></td><td>' . htmlspecialchars($studentInfo['class_name']) . '</td></tr>';
+    echo '<tr><td><strong>Rapor Tarihi:</strong></td><td>' . date('d.m.Y H:i') . '</td></tr>';
+    echo '</table><br>';
+    
+    echo '<h4>Özet İstatistikler</h4>';
+    echo '<table border="1">';
+    echo '<thead><tr><th>Toplam Ders</th><th>Katıldığı</th><th>Devamsızlık</th><th>Devam Oranı (%)</th></tr></thead>';
+    echo '<tbody><tr>';
+    echo '<td>' . $totalLessons . '</td>';
+    echo '<td>' . $presentCount . '</td>';
+    echo '<td>' . $absentCount . '</td>';
+    echo '<td>' . $attendanceRate . '</td>';
+    echo '</tr></tbody></table><br>';
+    
+    echo '<h4>Detaylı Geçmiş</h4>';
+    echo '<table border="1">';
+    echo '<thead><tr><th>Tarih</th><th>Ders</th><th>Öğretmen</th><th>Durum</th><th>Konu</th></tr></thead><tbody>';
+    
+    foreach ($attendanceHistory as $record) {
+        $statusText = $record['display_status'] === 'present' ? 'Katıldı' : ($record['display_status'] === 'absent' ? 'Katılmadı' : 'Yoklama Alınmamış');
+        echo '<tr>';
+        echo '<td>' . date('d.m.Y', strtotime($record['lesson_date'])) . '</td>';
+        echo '<td>' . htmlspecialchars($record['lesson_name']) . '</td>';
+        echo '<td>' . htmlspecialchars($record['teacher_name']) . '</td>';
+        echo '<td>' . $statusText . '</td>';
+        echo '<td>' . htmlspecialchars($record['topic'] ?? '') . '</td>';
+        echo '</tr>';
+    }
+    
+    echo '</tbody></table></body></html>';
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -264,9 +311,9 @@ $days = [1 => 'Pazartesi', 2 => 'Salı', 3 => 'Çarşamba', 4 => 'Perşembe', 5 
                         <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
                             <i class="fas fa-print me-1"></i> Yazdır
                         </button>
-                        <button class="btn btn-outline-success btn-sm" onclick="exportReport()">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
+                        <a href="?student_id=<?php echo $studentId; ?>&class_id=<?php echo $classId; ?>&export=xls" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-file-excel me-1"></i> Excel İndir
+                        </a>
                     </div>
                 </div>
             </div>
@@ -560,10 +607,10 @@ $days = [1 => 'Pazartesi', 2 => 'Salı', 3 => 'Çarşamba', 4 => 'Perşembe', 5 
                                 <i class="fas fa-print me-2"></i>
                                 Raporu Yazdır
                             </button>
-                            <button class="btn btn-outline-success" onclick="exportReport()">
+                            <a href="?student_id=<?php echo $studentId; ?>&class_id=<?php echo $classId; ?>&export=xls" class="btn btn-outline-success">
                                 <i class="fas fa-file-excel me-2"></i>
                                 Excel'e Aktar
-                            </button>
+                            </a>
                             <a href="class-details.php?id=<?php echo $classId; ?>" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>
                                 Sınıfa Dön
@@ -594,37 +641,7 @@ $days = [1 => 'Pazartesi', 2 => 'Salı', 3 => 'Çarşamba', 4 => 'Perşembe', 5 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function exportReport() {
-            // Basit CSV export
-            const studentName = "<?php echo addslashes($studentInfo['student_name']); ?>";
-            const className = "<?php echo addslashes($studentInfo['class_name']); ?>";
-            
-            let csv = "Öğrenci Devam Raporu\n";
-            csv += "Öğrenci: " + studentName + "\n";
-            csv += "Sınıf: " + className + "\n";
-            csv += "Rapor Tarihi: <?php echo date('d.m.Y H:i'); ?>\n\n";
-            csv += "ÖZET İSTATİSTİKLER\n";
-            csv += "Toplam Ders,Katıldığı,Devamsızlık,Devam Oranı\n";
-            csv += "<?php echo $totalLessons; ?>,<?php echo $presentCount; ?>,<?php echo $absentCount; ?>,<?php echo $attendanceRate; ?>%\n\n";
-            csv += "DETAYLI GEÇMİŞ\n";
-            csv += "Tarih,Ders,Öğretmen,Durum,Konu\n";
-            
-            <?php foreach ($attendanceHistory as $record): ?>
-            csv += "<?php echo date('d.m.Y', strtotime($record['lesson_date'])); ?>,";
-            csv += "<?php echo addslashes($record['lesson_name']); ?>,";
-            csv += "<?php echo addslashes($record['teacher_name']); ?>,";
-            csv += "<?php echo $record['display_status'] === 'present' ? 'Katıldı' : ($record['display_status'] === 'absent' ? 'Katılmadı' : 'Yoklama Alınmamış'); ?>,";
-            csv += "<?php echo addslashes($record['topic'] ?? ''); ?>\n";
-            <?php endforeach; ?>
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = studentName + '_devam_raporu.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        // JS Excel export removed - handled by PHP instead
     </script>
 </body>
 </html>

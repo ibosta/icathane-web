@@ -560,13 +560,19 @@ $missingAttendance = $lessonManager->getMissingAttendance($teacherId);
                 <a href="teacher-schedule-view.php" class="btn btn-outline-primary me-2">
                     <i class="fas fa-calendar-week"></i> Ders Programım
                 </a>
-                <a href="teacher-materials.php" class="btn btn-outline-info me-2">
+                <a href="teacher-materials.php" class="btn btn-outline-info me-2 mt-2">
                     <i class="fas fa-folder-open"></i> Ders Materyalleri
                 </a>
-                <a href="attendance.php" class="btn btn-outline-primary me-2">
+                <a href="teacher-history.php" class="btn btn-outline-success me-2 mt-2">
+                    <i class="fas fa-history"></i> Geçmiş Derslerim
+                </a>
+                <a href="teacher-profile.php" class="btn btn-outline-secondary me-2 mt-2">
+                    <i class="fas fa-user-edit"></i> Profilim
+                </a>
+                <a href="attendance.php" class="btn btn-outline-primary me-2 mt-2">
                     <i class="fas fa-clipboard-check"></i> Yoklama Al
                 </a>
-                <a href="../auth/logout.php" class="btn btn-outline-secondary">
+                <a href="../auth/logout.php" class="btn btn-outline-secondary mt-2">
                     <i class="fas fa-sign-out-alt"></i> Çıkış Yap
                 </a>
             </div>
